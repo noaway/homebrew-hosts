@@ -4,16 +4,12 @@
 class Hosts < Formula
   desc "hosts tool"
   homepage "https://github.com/noaway/hosts"
-  url "https://github.com/noaway/hosts/releases/download/0.1.1/hosts"
-  sha256 "1092a9b72b657c29e2f19551d428058a16fded155266fd15cd19fe41faf36a9c"
-  version "0.1.1"
+  url "https://github.com/noaway/hosts/releases/download/0.1.2/hosts-mac64-0.1.2.tar.xz"
+  sha256 "dfded6affc512c509c818b4fd4e36d450a3126a6a0507009b399090b15203ba8"
+  version "0.1.2"
   license "Apache-2.0"
   
   def install
     bin.install "hosts"
-  end
-
-  test do
-    system "false"
   end
 end
