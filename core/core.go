@@ -20,16 +20,11 @@ const (
 )
 
 func GetHosts() []Host {
-	hostList := []Host{}
-	newHostKeeper(filter).hostRange(func(h Host) bool {
-		hostList = append(hostList, h)
-		return true
-	})
-	return hostList
+	return loadHosts(debugboxFilter())
 }
 
 func RenderTable() {
-	hk := newHostKeeper(filter)
+	hk := newHostKeeper(debugboxFilter())
 	table := tablewriter.NewWriter(logrus.StandardLogger().Out)
 	table.SetHeader([]string{"id", "ip", "host_name"})
 	hk.hostRange(func(h Host) bool {
@@ -39,7 +34,21 @@ func RenderTable() {
 	table.Render()
 }
 
-func filter(h Host) bool { return strings.Contains(h.Hostname, "debugbox") }
+func debugboxFilter() filterFunc {
+	return func(h Host) bool { return strings.Contains(h.Hostname, "debugbox") }
+}
+
+func strFilter(str string) filterFunc {
+	return func(h Host) bool {
+		prefix := strings.Contains(h.Hostname, "debugbox")
+		switch {
+		case StrTo(str).MustInt() != 0:
+			return strings.Contains(h.Hostname, str) && prefix
+		default:
+			return h.ID == str && prefix
+		}
+	}
+}
 
 func getAuth(hostname string) (string, ssh.AuthMethod) {
 	identityPath := ssh_config.Get(hostname, "IdentityFile")
@@ -54,9 +63,8 @@ func getAuth(hostname string) (string, ssh.AuthMethod) {
 	return defaultUser, ssh.Password(defaultPasswd)
 }
 
-func Debugbox(id string) {
-	hk := newHostKeeper(filter)
-	h, ok := hk.get(id)
+func Debugbox(str string) {
+	h, ok := loadHost(strFilter(str))
 	if !ok {
 		return
 	}

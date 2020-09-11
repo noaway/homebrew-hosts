@@ -14,6 +14,8 @@ const (
 	EtcHostsPath = "/etc/hosts"
 )
 
+type filterFunc func(Host) bool
+
 type Host struct {
 	ID       string
 	IP       string
@@ -21,19 +23,44 @@ type Host struct {
 	Alias    string
 }
 
-func newHostKeeper(fn func(h Host) bool) *hostKeeper {
-	hk := &hostKeeper{bucket: make(map[string]*list.Element), list: list.New(), filterFunc: fn}
+func newHostKeeper(fn filterFunc) *hostKeeper {
+	hk := &hostKeeper{bucket: make(map[string]*list.Element), list: list.New(), filter: fn}
 	if err := hk.readHosts(); err != nil {
 		panic(err)
 	}
 	return hk
 }
 
-type hostKeeper struct {
-	bucket     map[string]*list.Element
-	list       *list.List
-	filterFunc func(h Host) bool
+func loadHosts(fn filterFunc) []Host {
+	hk := newHostKeeper(fn)
+	list := make([]Host, 0, hk.len())
+	hk.hostRange(func(h Host) bool {
+		list = append(list, h)
+		return true
+	})
+	return list
 }
+
+func loadHost(fn filterFunc) (Host, bool) {
+	hk := newHostKeeper(fn)
+	list := make([]Host, 0, hk.len())
+	hk.hostRange(func(h Host) bool {
+		list = append(list, h)
+		return true
+	})
+	if len(list) > 0 {
+		return list[0], true
+	}
+	return Host{}, false
+}
+
+type hostKeeper struct {
+	bucket map[string]*list.Element
+	list   *list.List
+	filter filterFunc
+}
+
+func (hk *hostKeeper) len() int { return hk.list.Len() }
 
 func (hk *hostKeeper) get(key string) (Host, bool) {
 	if elem, ok := hk.bucket[key]; ok {
@@ -102,10 +129,10 @@ loop:
 				h.Alias = s
 			}
 		}
-		if !filter(h) {
+		h.ID = md5HashBytes([]byte(fmt.Sprintf("%v%v", h.IP, h.Hostname)))[:8]
+		if hk.filter != nil && !hk.filter(h) {
 			continue loop
 		}
-		h.ID = md5HashBytes([]byte(fmt.Sprintf("%v%v", h.IP, h.Hostname)))[:8]
 		hk.push(h.ID, h)
 	}
 	return nil
