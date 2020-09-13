@@ -22,7 +22,7 @@ function set_basic_env {
 }
 set_basic_env
 
-if [[ $GIT_COMMIT_MSG  != "release" ]];then
+if [[ $GIT_COMMIT_MSG  != release* ]];then
     echo "评论中没有关键字 'release' 不需要发布版本"
     exit 1
 fi
