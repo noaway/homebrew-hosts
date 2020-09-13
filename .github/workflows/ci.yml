@@ -1,0 +1,40 @@
+# This is a basic workflow to help you get started with Actions
+
+name: ci
+
+on:
+  push:
+    branches: [ release/0.1 ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: set golang
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.14
+      - uses: actions/checkout@v2
+      - name: Run a multi-line script
+        run: |
+          make build-release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.version }}
+          release_name: ${{ env.version }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload_release_asset 
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.tarpath }}
+          asset_name: ${{ env.name }}
+          asset_content_type: application/octet-stream
