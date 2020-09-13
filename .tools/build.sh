@@ -5,10 +5,12 @@ set -e
 function set_basic_env {
     export GIT_BRANCH_BASENAME=`git rev-parse --abbrev-ref HEAD`
     export GIT_COMMIT="`git log | head -n 1 | awk '{print $2}'`"
+    export GIT_COMMIT_MSG=`git show -s --format=%B $GIT_COMMIT`
     export PROJECT_NAME=`basename $(git rev-parse --show-toplevel)`
     export SCRIPT_DIR=$(dirname $0)
     export PROJECT_ROOT="${SCRIPT_DIR}/../"
     export BUILD_DIR="${PROJECT_ROOT}/.build"
+
     mkdir -p ${BUILD_DIR}
 
     echo "GIT_BRANCH_BASENAME=${GIT_BRANCH_BASENAME}"
@@ -19,6 +21,11 @@ function set_basic_env {
     echo "BUILD_DIR=${BUILD_DIR}"
 }
 set_basic_env
+
+if [[ $GIT_COMMIT_MSG  != "release" ]];then
+    echo "评论中没有关键字 'release' 不需要发布版本"
+    exit 0
+fi
 
 echo "$PROJECT_ROOT"
 EXEC="$BUILD_DIR/$PROJECT_NAME"
