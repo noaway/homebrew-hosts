@@ -30,6 +30,6 @@ export TARNAME="$NAME.tar.xz"
 export TARPATH=".build/$TARNAME"
 cd "$BUILD_DIR" && tar caf "$TARNAME" "$PROJECT_NAME"
 
-echo "::set-env name=name::$NAME"
+echo "::set-env name=name::$TARNAME"
 echo "::set-env name=version::$VERSION"
 echo "::set-env name=tarpath::$TARPATH"

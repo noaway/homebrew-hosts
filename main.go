@@ -79,7 +79,7 @@ func cmdExec() *cobra.Command {
 }
 
 func main() {
-	cmdRoot := &cobra.Command{Use: "hosts", Run: hosts, Version: "0.1.4"}
+	cmdRoot := &cobra.Command{Use: "hosts", Run: hosts, Version: "0.1.5"}
 	cmdRoot.AddCommand(cmdGenPostmanEnv())
 	cmdRoot.AddCommand(cmdExec())
 	_ = cmdRoot.Execute()
