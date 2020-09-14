@@ -4,10 +4,14 @@ import (
 	"bufio"
 	"container/list"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
 	"strings"
+
+	"github.com/kevinburke/ssh_config"
+	"golang.org/x/crypto/ssh"
 )
 
 const (
@@ -21,6 +25,34 @@ type Host struct {
 	IP       string
 	Hostname string
 	Alias    string
+	auth     *auth
+}
+
+func (h *Host) getAuth() error {
+	identityPath := ssh_config.Get(h.Hostname, "IdentityFile")
+	user := ssh_config.Get(h.Hostname, "User")
+	switch {
+	case identityPath != "" && user != "":
+		key, err := ioutil.ReadFile(expand(identityPath))
+		if err != nil {
+			return err
+		}
+		signer, err := ssh.ParsePrivateKey(key)
+		if err != nil {
+			return err
+		}
+		h.auth = &auth{user, ssh.PublicKeys(signer)}
+		return nil
+	default:
+		h.auth = &auth{defaultUser, ssh.Password(defaultPasswd)}
+	}
+	return nil
+}
+
+// auth struct
+type auth struct {
+	user   string
+	method ssh.AuthMethod
 }
 
 func newHostKeeper(fn filterFunc) *hostKeeper {

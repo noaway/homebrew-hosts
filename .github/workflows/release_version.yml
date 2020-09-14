@@ -2,7 +2,7 @@ name: release_version
 
 on:
   push:
-    branches: [ release/0.1 ]
+    branches: [ release/0.2 ]
 
 jobs:
   build:
