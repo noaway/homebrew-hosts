@@ -78,6 +78,17 @@ func DebugboxStatus(str string) {
 	}
 }
 
+func DebugboxRun(str string, cmd string) {
+	h, ok := loadHost(strFilter(str))
+	if !ok {
+		return
+	}
+	c := sshClient(&h)
+	out, err := c.RunCmd(cmd)
+	procErr(err)
+	logrus.Info(out)
+}
+
 func (c *client) DebugboxVersion() (string, error) {
 	cmd := "spadmin upgrader version"
 	return c.RunCmd(cmd)
