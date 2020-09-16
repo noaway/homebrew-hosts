@@ -50,3 +50,13 @@ func Debugbox(str string) {
 	}
 	procErr(sshClient(&h).Interaction().err)
 }
+
+func DebugboxStatus(str string) {
+	h, ok := loadHost(strFilter(str))
+	if !ok {
+		return
+	}
+	out, err := sshClient(&h).RunCmd("spadmin upgrader version")
+	procErr(err)
+	logrus.Info(out)
+}

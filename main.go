@@ -78,9 +78,23 @@ func cmdExec() *cobra.Command {
 	return cmd
 }
 
+func cmdStatus() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "status",
+		Short: "run status",
+		Run: func(_ *cobra.Command, args []string) {
+			if len(args) > 0 {
+				core.DebugboxStatus(args[0])
+			}
+		},
+	}
+	return cmd
+}
+
 func main() {
-	cmdRoot := &cobra.Command{Use: "hosts", Run: hosts, Version: "0.2.0"}
+	cmdRoot := &cobra.Command{Use: "hosts", Run: hosts, Version: "0.2.1"}
 	cmdRoot.AddCommand(cmdGenPostmanEnv())
 	cmdRoot.AddCommand(cmdExec())
+	cmdRoot.AddCommand(cmdStatus())
 	_ = cmdRoot.Execute()
 }

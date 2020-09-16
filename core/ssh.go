@@ -62,3 +62,19 @@ func (c *client) Interaction() *client {
 	procErr(session.Run("/bin/bash"))
 	return c
 }
+
+func (c *client) RunCmd(cmd string) (string, error) {
+	if c.err != nil {
+		return "", c.err
+	}
+	session, err := c.NewSession()
+	if err != nil {
+		return "", err
+	}
+	defer session.Close()
+	out, err := session.CombinedOutput(cmd)
+	if err != nil {
+		return string(out), fmt.Errorf("%v, %s", err, string(out))
+	}
+	return string(out), nil
+}
