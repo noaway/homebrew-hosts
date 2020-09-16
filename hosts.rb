@@ -4,9 +4,9 @@
 class Hosts < Formula
   desc "hosts tool"
   homepage "https://github.com/noaway/hosts"
-  url "https://github.com/noaway/hosts/releases/download/v0.2.1/hosts-mac64-v0.2.1.tar.xz"
-  sha256 "1c9e57ff984e11f3a98c2721de6944c92869e77ddb6d2eeaa0156ca004e50f9b"
-  version "0.2.1"
+  url "https://github.com/noaway/hosts/releases/download/v0.2.2/hosts-mac64-v0.2.2.tar.xz"
+  sha256 "6252b3e6e23564f48b667fe5e7b391e40629780e8adc364f32ce5b844b7f8d05"
+  version "0.2.2"
   license "Apache-2.0"
   
   def install
