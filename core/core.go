@@ -1,6 +1,7 @@
 package core
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/olekukonko/tablewriter"
@@ -11,6 +12,8 @@ const (
 	defaultUser   = "root"
 	defaultPasswd = "MhxzKhl2015"
 )
+
+var re = regexp.MustCompile(`"(.*)"`)
 
 func GetHosts() []Host {
 	return loadHosts(debugboxFilter())
@@ -43,6 +46,12 @@ func strFilter(str string) filterFunc {
 	}
 }
 
+func GetSuperToken(h *Host) string {
+	out, err := sshClient(h).SuperToken()
+	procErr(err)
+	return out
+}
+
 func Debugbox(str string) {
 	h, ok := loadHost(strFilter(str))
 	if !ok {
@@ -56,15 +65,33 @@ func DebugboxStatus(str string) {
 	if !ok {
 		return
 	}
-	client := sshClient(&h)
-	procErr(client.err)
-	cmds := []string{
-		"spadmin upgrader version",
-		"spadmin config get global -n super_api_token",
+	c := sshClient(&h)
+	procErr(c.err)
+	cmds := []func(*client) (string, error){
+		(*client).DebugboxVersion,
+		(*client).SuperToken,
 	}
 	for _, cmd := range cmds {
-		out, err := client.RunCmd(cmd)
+		out, err := cmd(c)
 		procErr(err)
 		logrus.Info(out)
 	}
+}
+
+func (c *client) DebugboxVersion() (string, error) {
+	cmd := "spadmin upgrader version"
+	return c.RunCmd(cmd)
+}
+
+func (c *client) SuperToken() (string, error) {
+	cmd := "spadmin config get global -n super_api_token"
+	out, err := c.RunCmd(cmd)
+	if err != nil {
+		return "", err
+	}
+	strs := re.FindStringSubmatch(out)
+	if len(strs) > 0 {
+		return strings.Replace(strs[0], `"`, "", -1), nil
+	}
+	return "", nil
 }

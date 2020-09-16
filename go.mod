@@ -1,4 +1,4 @@
-module github.com/noaway/celery
+module github.com/noaway/hosts
 
 go 1.14
 

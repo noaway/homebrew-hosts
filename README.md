@@ -1,2 +1,2 @@
 ## install
-brew tap noaway/celery && brew install celery
+brew tap noaway/hosts && brew install hosts

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/noaway/celery/core"
-	"github.com/noaway/celery/postman"
+	"github.com/noaway/hosts/core"
+	"github.com/noaway/hosts/postman"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ func cmdGenPostmanEnv() *cobra.Command {
 						},
 						{
 							Key:     "token",
-							Value:   "",
+							Value:   core.GetSuperToken(&host),
 							Enabled: true,
 						},
 						{
@@ -92,7 +92,7 @@ func cmdStatus() *cobra.Command {
 }
 
 func main() {
-	cmdRoot := &cobra.Command{Use: "hosts", Run: hosts, Version: "0.2.2"}
+	cmdRoot := &cobra.Command{Use: "hosts", Run: hosts, Version: "0.2.3"}
 	cmdRoot.AddCommand(cmdGenPostmanEnv())
 	cmdRoot.AddCommand(cmdExec())
 	cmdRoot.AddCommand(cmdStatus())
