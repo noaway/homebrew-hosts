@@ -92,7 +92,7 @@ func cmdStatus() *cobra.Command {
 }
 
 func main() {
-	cmdRoot := &cobra.Command{Use: "hosts", Run: hosts, Version: "0.2.1"}
+	cmdRoot := &cobra.Command{Use: "hosts", Run: hosts, Version: "0.2.2"}
 	cmdRoot.AddCommand(cmdGenPostmanEnv())
 	cmdRoot.AddCommand(cmdExec())
 	cmdRoot.AddCommand(cmdStatus())

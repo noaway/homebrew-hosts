@@ -56,7 +56,15 @@ func DebugboxStatus(str string) {
 	if !ok {
 		return
 	}
-	out, err := sshClient(&h).RunCmd("spadmin upgrader version")
-	procErr(err)
-	logrus.Info(out)
+	client := sshClient(&h)
+	procErr(client.err)
+	cmds := []string{
+		"spadmin upgrader version",
+		"spadmin config get global -n super_api_token",
+	}
+	for _, cmd := range cmds {
+		out, err := client.RunCmd(cmd)
+		procErr(err)
+		logrus.Info(out)
+	}
 }
